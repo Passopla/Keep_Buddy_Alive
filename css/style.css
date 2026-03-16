@@ -1,0 +1,397 @@
+/* ─── Variables ──────────────────────────────────────────────── */
+:root {
+  --bg:      #1a1612;
+  --panel:   #221e19;
+  --border:  #3a3028;
+  --accent:  #c8a96e;
+  --accent2: #7ea88a;
+  --danger:  #c0392b;
+  --warn:    #e67e22;
+  --text:    #d4c5a9;
+  --muted:   #7a6e5f;
+
+  --hunger:  #e8a840;
+  --thirst:  #4a9ebb;
+  --hygiene: #7ea88a;
+  --energy:  #9b7bb8;
+}
+
+/* ─── Reset & Base ───────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(200, 169, 110, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(126, 168, 138, 0.03) 0%, transparent 60%);
+  color: var(--text);
+  font-family: 'Courier Prime', monospace;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* ─── Layout ─────────────────────────────────────────────────── */
+.game-wrapper {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header ─────────────────────────────────────────────────── */
+.header {
+  text-align: center;
+  padding: 16px 0 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.header h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.8rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.header p {
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.day-badge {
+  display: inline-block;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 2px 10px;
+  margin-top: 8px;
+}
+
+/* ─── Difficulty Toggle ──────────────────────────────────────── */
+.diff-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+
+.diff-toggle:focus-visible .diff-track {
+  border-color: var(--accent);
+}
+
+.diff-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+.diff-toggle[data-difficulty="easy"] .diff-easy { color: var(--accent2); }
+.diff-toggle[data-difficulty="hard"] .diff-hard  { color: var(--danger);  }
+
+.diff-track {
+  width: 34px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  position: relative;
+  transition: border-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.diff-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent2);
+  transition: left 0.2s ease, background-color 0.2s ease;
+}
+
+.diff-toggle[data-difficulty="hard"] .diff-thumb {
+  left: 20px;
+  background: var(--danger);
+}
+
+/* ─── Sprite Area ────────────────────────────────────────────── */
+.sprite-area {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  position: relative;
+  height: 220px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.sprite-area::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--border);
+}
+
+.ground-shadow {
+  position: absolute;
+  bottom: 8px;
+  width: 80px;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  filter: blur(4px);
+  transition: width 0.5s ease, opacity 0.5s ease;
+}
+
+#sprite {
+  position: relative;
+  z-index: 2;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.mood-label {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mood-value {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-style: italic;
+}
+
+/* ─── Stats Panel ────────────────────────────────────────────── */
+.stats-panel {
+  border: 1px solid var(--border);
+  border-top: none;
+  padding: 14px 16px;
+  background: var(--panel);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 20px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.stat-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+
+.stat-val {
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* Stat value colours */
+.stat[data-stat="hunger"] .stat-val { color: var(--hunger); }
+.stat[data-stat="thirst"]  .stat-val { color: var(--thirst); }
+.stat[data-stat="hygiene"] .stat-val { color: var(--hygiene); }
+.stat[data-stat="energy"]  .stat-val { color: var(--energy); }
+
+.bar-track {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  transition: width 0.4s ease, background-color 0.4s ease;
+}
+
+/* Default bar colours */
+.stat[data-stat="hunger"] .bar-fill { background-color: var(--hunger); }
+.stat[data-stat="thirst"]  .bar-fill { background-color: var(--thirst); }
+.stat[data-stat="hygiene"] .bar-fill { background-color: var(--hygiene); }
+.stat[data-stat="energy"]  .bar-fill { background-color: var(--energy); }
+
+/* Warning states — JS adds these classes */
+.bar-fill.warn     { background-color: var(--warn) !important; }
+.bar-fill.critical { background-color: var(--danger) !important; animation: pulse-bar 0.8s ease-in-out infinite alternate; }
+
+@keyframes pulse-bar {
+  from { opacity: 1; }
+  to   { opacity: 0.3; }
+}
+
+/* ─── Action Buttons ─────────────────────────────────────────── */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  padding: 12px 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn.active {
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+
+.btn-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ─── Log ────────────────────────────────────────────────────── */
+.log {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  padding: 8px 12px;
+  min-height: 36px;
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  transition: color 0.3s ease;
+}
+
+.log.urgent {
+  color: var(--warn);
+}
+
+/* ─── Game Over Overlay ──────────────────────────────────────── */
+#gameover {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 6, 0.92);
+  z-index: 100;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+#gameover.show {
+  display: flex;
+}
+
+.go-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.5rem;
+  letter-spacing: 0.2em;
+  color: var(--danger);
+  text-align: center;
+  line-height: 1;
+}
+
+.go-days {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+}
+
+.go-cause {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--muted);
+  text-align: center;
+  max-width: 260px;
+  line-height: 1.6;
+}
+
+.go-sub {
+  font-size: 0.8rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.btn-restart {
+  margin-top: 12px;
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: 'Courier Prime', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 12px 32px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-restart:hover {
+  background: rgba(200, 169, 110, 0.1);
+}

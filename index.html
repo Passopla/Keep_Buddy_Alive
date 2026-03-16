@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Buddy — Keep Him Alive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="game-wrapper">
+
+    <header class="header">
+      <h1>Crack Head</h1>
+      <p>keep him alive</p>
+      <div class="day-badge" id="day-counter">Day 1</div>
+      <div class="diff-toggle" id="btn-difficulty" data-difficulty="easy" role="button" tabindex="0">
+        <span class="diff-label diff-easy">Easy</span>
+        <div class="diff-track"><div class="diff-thumb"></div></div>
+        <span class="diff-label diff-hard">Hard</span>
+      </div>
+    </header>
+
+    <section class="sprite-area">
+      <span class="mood-label">Status</span>
+      <span class="mood-value" id="mood-text">Chillin'</span>
+      <div class="ground-shadow" id="ground-shadow"></div>
+      <canvas id="sprite" width="208" height="208"></canvas>
+    </section>
+
+    <section class="stats-panel">
+      <div class="stat" data-stat="hunger">
+        <div class="stat-header">
+          <span class="stat-label">Hunger</span>
+          <span class="stat-val" id="hunger-val">100</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="hunger-bar" style="width:100%"></div>
+        </div>
+      </div>
+      <div class="stat" data-stat="thirst">
+        <div class="stat-header">
+          <span class="stat-label">Thirst</span>
+          <span class="stat-val" id="thirst-val">100</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="thirst-bar" style="width:100%"></div>
+        </div>
+      </div>
+      <div class="stat" data-stat="hygiene">
+        <div class="stat-header">
+          <span class="stat-label">Hygiene</span>
+          <span class="stat-val" id="hygiene-val">100</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="hygiene-bar" style="width:100%"></div>
+        </div>
+      </div>
+      <div class="stat" data-stat="energy">
+        <div class="stat-header">
+          <span class="stat-label">Energy</span>
+          <span class="stat-val" id="energy-val">100</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="energy-bar" style="width:100%"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button class="btn" id="btn-feed">
+        <span class="btn-icon">🍞</span> Feed
+      </button>
+      <button class="btn" id="btn-drink">
+        <span class="btn-icon">💧</span> Give Water
+      </button>
+      <button class="btn" id="btn-wash">
+        <span class="btn-icon">🧼</span> Wash Up
+      </button>
+      <button class="btn" id="btn-sleep">
+        <span class="btn-icon">😴</span> Let Sleep
+      </button>
+    </div>
+
+    <div class="log" id="log">Buddy is just standing around.</div>
+
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="gameover">
+    <div class="go-title">BUDDY<br>PASSED OUT</div>
+    <div class="go-days" id="go-days">Survived 4 Days</div>
+    <div class="go-cause" id="go-cause">His thirst got the better of him.</div>
+    <div class="go-sub">thanks for trying</div>
+    <button class="btn-restart" id="btn-restart">Try Again</button>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+
+</body>
+</html>
