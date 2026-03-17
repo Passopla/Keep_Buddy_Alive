@@ -113,3 +113,94 @@ Stats DO decay while panhandling — at `0.1×` normal rate. The popup correctly
 **Bug:** the difficulty toggle in popup.js only mutated the local `state` copy. The background worker's state (and storage) never knew about the change. On next popup open, `getState` returned the background's stale `difficulty: 'easy'`.
 
 **Fix:** toggle now sends `{ type: 'setDifficulty', difficulty }` via `chrome.runtime.sendMessage`. Background updates `state.difficulty`, saves to storage, and returns the updated state. Popup syncs its local state from the response.
+
+---
+
+## Chat-Bot-Buddy Branch (2026-03-17)
+
+### What we built
+A separate branch (`chat-bot-buddy`) that takes the standalone webapp (not the extension) and integrates a live AI chatbot powered by Buddy's personality. Buddy can be spoken to directly and will occasionally say something unprompted.
+
+**Files added:**
+- `js/chat.js` — Buddy's personality, system prompt builder, conversation history (`appendHistory`/`clearHistory`), `STARTERS` array, `askBuddy()`, `getBuddyInitiation()`
+- `js/llm.js` — provider abstraction layer; the only file that makes fetch calls to AI APIs
+- `js/config.js` — gitignored runtime config; sets `window.BUDDY_CONFIG` with provider, apiKey, model
+
+**Extension files removed from this branch:** `manifest.json`, `popup.html`, `js/background.js`, `js/popup.js`, `js/storage.js`
+
+**Branch rule:** `chat.js` never imports from a provider directly — it only calls `sendMessage()` from `llm.js`. Switching provider requires only changing `config.js`.
+
+---
+
+### Provider abstraction (llm.js)
+
+`sendMessage(systemPrompt, messages, config)` dispatches to one of six private provider functions based on `config.provider`. Each returns a plain string.
+
+| Provider | Base URL | Default model |
+|----------|----------|---------------|
+| `anthropic` | `api.anthropic.com/v1/messages` | `claude-haiku-4-5` |
+| `gemini` | `generativelanguage.googleapis.com/v1beta/...` | `gemini-1.5-flash` |
+| `groq` | `api.groq.com/openai/v1/chat/completions` | `llama-3.1-8b-instant` |
+| `openai` | `api.openai.com/v1/chat/completions` | `gpt-4o-mini` |
+| `deepseek` | `api.deepseek.com/chat/completions` | `deepseek-chat` |
+| `kimi` | `api.moonshot.cn/v1/chat/completions` | `moonshot-v1-8k` |
+
+`config.model || 'default'` — empty string is falsy, so leaving `model: ""` in config correctly falls back to the provider default.
+
+Gemini maps `assistant → model` in the role field; Anthropic uses a separate top-level `system` field; all others prepend the system prompt as the first message in the array.
+
+On any error, `sendMessage` catches and returns `'...'` so the game never crashes from a failed API call.
+
+---
+
+### Anthropic message sanitization
+
+Anthropic's API rejects requests where the messages array starts with an `assistant` role, has two consecutive messages with the same role, or is empty.
+
+`callAnthropic` sanitizes the array before sending:
+1. Strip any leading `assistant` messages
+2. Remove any entry where `role === previous.role`
+3. Fall back to `[{ role: 'user', content: 'hey' }]` if the array ends up empty
+
+---
+
+### API key security
+
+The API key is never in any committed file. `js/config.js` is gitignored. It is loaded as a plain `<script>` tag (not a module) before `main.js`, so it sets `window.BUDDY_CONFIG` synchronously. Module code reads `window.BUDDY_CONFIG` at call time.
+
+---
+
+### Buddy initiation — moved out of rAF loop
+
+**Bug:** `getBuddyInitiation` was being called inside the `requestAnimationFrame` loop. The `lastInitiation` cooldown check (`Date.now() - lastInitiation > 30000`) only prevented re-entry while a call was in-flight (`initiating` flag), but the condition was evaluated ~60 times per second, causing the flag/timer logic to race.
+
+**Fix:** removed all initiation logic from `loop()`. A single `setInterval` set up once in `boot()` fires every 30 000 ms:
+
+```js
+setInterval(async () => {
+  if (state.dead || state.panhandling) return;
+  const line = await getBuddyInitiation(state);
+  if (line) {
+    appendChatMessage('buddy', line);
+    appendHistory('assistant', line);
+  }
+}, 30000);
+```
+
+No flag, no timestamp, no cooldown math — the interval is the cooldown.
+
+---
+
+### Conversation history
+
+`chat.js` maintains a module-level `history` array capped at 12 entries. `askBuddy` and `getBuddyInitiation` both slice the last 8 entries when building the messages payload. `clearHistory()` is called on restart.
+
+History is not persisted between page loads — intentional, Buddy starts fresh each session.
+
+---
+
+### Wash log text
+
+Updated across all three branches (`main`, `extension`, `chat-bot-buddy`):
+
+> `"Getting cleaned up. He seems lighter."` → `"All washed up. Lookin' good & healthy."`

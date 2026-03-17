@@ -10,7 +10,7 @@ const els = {
   dayCounter:  document.getElementById('day-counter'),
   moodText:    document.getElementById('mood-text'),
   groundShadow:document.getElementById('ground-shadow'),
-  log:         document.getElementById('log'),
+  chatHistory: document.getElementById('chat-history'),
   gameover:    document.getElementById('gameover'),
   goDays:      document.getElementById('go-days'),
   goCause:     document.getElementById('go-cause'),
@@ -92,10 +92,22 @@ export function renderSprite(state, images) {
   ctx.drawImage(img, sx, 0, cfg.fw, cfg.fh, dx, dy, dw, dh);
 }
 
-// ─── Log Message ─────────────────────────────────────────────
+// ─── Chat Panel ───────────────────────────────────────────────
+export function appendChatMessage(role, text, urgent = false) {
+  const div = document.createElement('div');
+  div.classList.add(role === 'buddy' ? 'msg-buddy' : 'msg-player');
+  if (urgent) div.classList.add('msg-urgent');
+  div.textContent = text;
+  els.chatHistory.appendChild(div);
+  els.chatHistory.scrollTop = els.chatHistory.scrollHeight;
+}
+
 export function setLog(msg, urgent = false) {
-  els.log.textContent = msg;
-  els.log.classList.toggle('urgent', urgent);
+  appendChatMessage('buddy', msg, urgent);
+}
+
+export function initChat() {
+  appendChatMessage('buddy', "yeah i'm up. what do you want.");
 }
 
 // ─── Gone State ───────────────────────────────────────────────

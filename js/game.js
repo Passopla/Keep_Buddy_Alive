@@ -33,7 +33,7 @@ export const ACTIONS = {
     duration: 3,
     anim: 'Idle',   // no dedicated wash anim, use idle
     sideEffects: {},
-    log: 'Getting cleaned up. He seems lighter.',
+    log: "All washed up. Lookin' good & healthy.",
   },
   sleep: {
     stat: 'energy',

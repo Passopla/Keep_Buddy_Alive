@@ -84,7 +84,18 @@
       </button>
     </div>
 
-    <div class="log" id="log">Buddy is just standing around.</div>
+    <section class="chat-panel">
+      <div class="chat-history" id="chat-history"></div>
+      <div class="chat-input-row">
+        <input
+          type="text"
+          id="chat-input"
+          placeholder="say something..."
+          autocomplete="off"
+        />
+        <button id="chat-send">↵</button>
+      </div>
+    </section>
 
   </div>
 
@@ -97,7 +108,8 @@
     <button class="btn-restart" id="btn-restart">Try Again</button>
   </div>
 
-  <script type="module" src="js/popup.js"></script>
+  <script src="js/config.js"></script>
+  <script type="module" src="js/main.js"></script>
 
 </body>
 </html>

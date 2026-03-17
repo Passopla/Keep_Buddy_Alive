@@ -26,7 +26,16 @@ import {
   showGameOver,
   hideGameOver,
   bindRestartButton,
+  appendChatMessage,
+  initChat,
 } from './ui.js';
+import {
+  askBuddy,
+  getBuddyInitiation,
+  appendHistory,
+  clearHistory,
+  STARTERS,
+} from './chat.js';
 
 // ─── Module-level state ───────────────────────────────────────
 let state   = createState();
@@ -81,6 +90,34 @@ function handleDeath(cause) {
   setTimeout(() => showGameOver(state.day, message), 1200);
 }
 
+// ─── Chat ─────────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const userMessage = input.value.trim();
+  if (!userMessage) return;
+
+  if (isPanhandling(state)) {
+    appendChatMessage('buddy', 'not here.');
+    input.value = '';
+    return;
+  }
+
+  appendChatMessage('player', userMessage);
+  appendHistory('user', userMessage);
+  input.value = '';
+
+  const response = await askBuddy(userMessage, state);
+  appendChatMessage('buddy', response);
+  appendHistory('assistant', response);
+}
+
+function startChat() {
+  initChat();
+  const starter = STARTERS[Math.floor(Math.random() * STARTERS.length)];
+  appendChatMessage('buddy', starter);
+  appendHistory('assistant', starter);
+}
+
 // ─── Restart ──────────────────────────────────────────────────
 function restartGame() {
   hideGameOver();
@@ -90,8 +127,9 @@ function restartGame() {
   lastDay      = 1;
   lastRealTime = performance.now();
   setButtonsDisabled(false);
-  setLog('Buddy is just standing around.');
   updateDay(1);
+  clearHistory();
+  startChat();
 }
 
 // ─── Time Tracking ────────────────────────────────────────────
@@ -156,6 +194,7 @@ function loop() {
         updateDay(state.day);
         lastDay = state.day;
       }
+
     }
   }
 
@@ -183,7 +222,23 @@ async function boot() {
   diffBtn.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); diffBtn.click(); }
   });
-  setLog('Buddy is just standing around.');
+
+  // Chat bindings
+  document.getElementById('chat-send').addEventListener('click', sendMessage);
+  document.getElementById('chat-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendMessage();
+  });
+
+  startChat();
+
+  setInterval(async () => {
+    if (state.dead || state.panhandling) return;
+    const line = await getBuddyInitiation(state);
+    if (line) {
+      appendChatMessage('buddy', line);
+      appendHistory('assistant', line);
+    }
+  }, 30000);
 
   requestAnimationFrame(loop);
 }
