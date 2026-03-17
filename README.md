@@ -61,4 +61,4 @@ All sheets have a black background (transparent in-game via canvas rendering).
 | Sleep       | 8      | 208×208    |
 | Drink       | 16     | 125×125    |
 
-Each animation has a Clean and Dirty variant.
+Each animation has a Clean and Dirty variant created using Pixelengine.ai.
