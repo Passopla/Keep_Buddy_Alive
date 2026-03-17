@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Buddy — Keep Him Alive",
+  "version": "1.0",
+  "description": "Keep Buddy alive.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "js/background.js",
+    "type": "module"
+  },
+  "permissions": ["storage", "alarms"],
+  "icons": {}
+}
