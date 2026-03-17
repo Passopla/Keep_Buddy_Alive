@@ -19,10 +19,10 @@ He'll start conversations on his own. He asks questions you don't expect — abo
 
 ## Screenshots
 
-![Buddy chillin](screenshots/screenshot1.png)
+![Buddy chillin](screenshots/screenshot_clean.png)
 *A good day. Stats are high. He's in the mood to talk.*
 
-![Buddy dirty](screenshots/screenshot2.png)
+![Buddy dirty](screenshots/screenshot_dirty.png)
 *Hygiene dropped below 15. He switched to his dirty sprites automatically and got quieter.*
 
 ![Buddy chatting](screenshots/screenshot3.png)
